@@ -42,7 +42,6 @@ final class SalleController
 
     public function store(): void
     {
-        // À compléter avec le Validator + Builder + Service
     }
 
     public function edit(int $id): void
@@ -62,6 +61,5 @@ final class SalleController
 
     public function update(int $id): void
     {
-        // À compléter
     }
 }

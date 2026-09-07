@@ -45,11 +45,9 @@ final class ReservationController
 
     public function store(): void
     {
-        // À compléter avec Validator + Builder + DTO + Service
     }
 
     public function cancel(int $id): void
     {
-        // À compléter avec AnnulerReservationService
     }
 }
