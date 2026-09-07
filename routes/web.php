@@ -10,7 +10,6 @@ return function ($router): void {
     
     $router->addRoute('GET','/',[SalleController::class, 'index']);
 
-    
     $router->addRoute('GET','/salles',[SalleController::class, 'index']);
 
     $router->addRoute('GET','/salles/create',[SalleController::class, 'create']);
@@ -23,7 +22,7 @@ return function ($router): void {
 
     $router->addRoute('POST','/salles/{id:\d+}/edit',[SalleController::class, 'update']);
 
-    
+
     $router->addRoute('GET','/reservations',[ReservationController::class, 'index']);
 
     $router->addRoute('GET','/reservations/create',[ReservationController::class, 'create']);
@@ -32,5 +31,5 @@ return function ($router): void {
 
     $router->addRoute('GET','/reservations/{id:\d+}',[ReservationController::class, 'show']);
 
-    $router->addRoute('POST','/reservations/{id:\d+}/cancel',[ReservationController::class, 'cancel']);
+    $router->addRoute('POST','/reservations/{id:\d+/cancel}',[ReservationController::class, 'cancel']);
 };

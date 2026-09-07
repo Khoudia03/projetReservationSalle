@@ -2,12 +2,16 @@
 
 declare(strict_types=1);
 
-require_once dirname(__DIR__) . '/vendor/autoload.php';
-
-require_once dirname(__DIR__) . '/config/database.php';
+require dirname(__DIR__) . '/vendor/autoload.php';
 
 use App\Application;
+use Config\ContainerFactory;
+use Illuminate\Database\Capsule\Manager;
 
-$application = new Application();
+$container = ContainerFactory::create();
+
+$container->get(Manager::class);
+
+$application = $container->get(Application::class);
 
 $application->run();
