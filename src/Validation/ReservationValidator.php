@@ -28,11 +28,11 @@ class ReservationValidator implements ValidatorInterface
             $errors['motif'] = 'Le motif doit contenir entre 5 et 255 caractères.';
         }
 
-        if (!v::stringType()->validate($data['date_debut'] ?? null)) {
+        if (!v::dateTime('Y-m-d H:i:s')->validate($data['date_debut'] ?? null)) {
             $errors['date_debut'] = 'La date de début est invalide.';
         }
 
-        if (!v::stringType()->validate($data['date_fin'] ?? null)) {
+        if (!v::dateTime('Y-m-d H:i:s')->validate($data['date_fin'] ?? null)) {
             $errors['date_fin'] = 'La date de fin est invalide.';
         }
 
