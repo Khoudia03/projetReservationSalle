@@ -1,10 +1,16 @@
 name: Publish Docker image for Git tags
 
-on:
+'on':
   push:
     tags:
       - '*'
   workflow_dispatch:
+    inputs:
+      publish_all:
+        description: 'Publier aussi tous les tags historiques'
+        required: false
+        default: true
+        type: boolean
 
 permissions:
   contents: read
@@ -12,10 +18,14 @@ permissions:
 jobs:
   docker-publish:
     runs-on: ubuntu-latest
+    env:
+      DOCKER_REPO: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO || 'projetreservation' }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Ensure Docker files exist
         shell: bash
@@ -46,12 +56,39 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push Docker image for Git tag
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO || 'projetreservation' }}:${{ github.ref_name }}
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO || 'projetreservation' }}:latest
+      - name: Determine tags to publish
+        id: tags
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.publish_all }}" == "true" ]]; then
+            tags=$(git tag --list | sort -V)
+          elif [[ "${{ github.ref_type }}" == "tag" ]]; then
+            tags="${{ github.ref_name }}"
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            tags="${{ github.ref_name }}"
+          else
+            tags="${{ github.ref_name }}"
+          fi
+
+          printf 'tags<<EOF\n%s\nEOF\n' "$tags" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push Docker images
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          while IFS= read -r tag; do
+            [[ -z "$tag" ]] && continue
+            echo "Publishing $tag"
+            docker build -t "$DOCKER_REPO:$tag" .
+            docker push "$DOCKER_REPO:$tag"
+          done <<< "${{ steps.tags.outputs.tags }}"
+
+          latest_tag=$(git tag --list | sort -V | tail -n 1)
+          if [[ -n "$latest_tag" ]]; then
+            echo "Setting latest to $latest_tag"
+            docker tag "$DOCKER_REPO:$latest_tag" "$DOCKER_REPO:latest"
+            docker push "$DOCKER_REPO:latest"
+          fi
