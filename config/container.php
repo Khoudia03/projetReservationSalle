@@ -5,17 +5,24 @@ declare(strict_types=1);
 use App\Application;
 use App\Controller\ReservationController;
 use App\Controller\SalleController;
+use App\Http\HtmlResponseStrategy;
+use App\Http\JsonResponseStrategy;
+use App\Http\ResponseStrategyInterface;
 use App\Repositorie\EloquentReservationRepository;
 use App\Repositorie\EloquentSalleRepository;
 use App\Repositorie\ReservationRepositoryInterface;
 use App\Repositorie\SalleRepositoryInterface;
 use App\Service\AnnulerReservationService;
 use App\Service\CreerReservationService;
+use App\Service\ModifierSalleService;
+use App\Service\ReservationService;
+use App\Service\SalleService;
 use App\Validation\ReservationValidator;
 use App\Validation\SalleValidator;
 use Dotenv\Dotenv;
 use FastRoute\Dispatcher;
 use Illuminate\Database\Capsule\Manager;
+use Psr\Container\ContainerInterface;
 use function DI\autowire;
 use function DI\factory;
 use function FastRoute\simpleDispatcher;
@@ -52,6 +59,22 @@ return [
     }),
 
 
+    ResponseStrategyInterface::class =>
+        factory(function (ContainerInterface $c): ResponseStrategyInterface {
+
+            $format = $_GET['format'] ?? null;
+
+            $accept = $_SERVER['HTTP_ACCEPT'] ?? '';
+
+            $veutDuJson = $format === 'json'
+                || str_contains($accept, 'application/json');
+
+            return $veutDuJson
+                ? $c->get(JsonResponseStrategy::class)
+                : $c->get(HtmlResponseStrategy::class);
+        }),
+
+
 
     SalleRepositoryInterface::class =>
         autowire(EloquentSalleRepository::class),
@@ -75,6 +98,15 @@ return [
 
     AnnulerReservationService::class =>
         autowire(AnnulerReservationService::class),
+
+    SalleService::class =>
+        autowire(SalleService::class),
+
+    ReservationService::class =>
+        autowire(ReservationService::class),
+
+    ModifierSalleService::class =>
+        autowire(ModifierSalleService::class),
 
 
 

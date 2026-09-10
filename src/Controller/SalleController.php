@@ -4,62 +4,72 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Repositorie\SalleRepositoryInterface;
+use App\Builder\CreerSalleDTOBuilder;
+use App\Exception\SalleIndisponibleException;
+use App\Http\ResponseStrategyInterface;
+use App\Service\ModifierSalleService;
+use App\Service\SalleService;
 
-final class SalleController
+final class SalleController extends AbstractController
 {
     public function __construct(
-        private SalleRepositoryInterface $salleRepository
+        private SalleService $salleService,
+        private ModifierSalleService $modifierSalleService,
+        ResponseStrategyInterface $response
     ) {
+        parent::__construct($response);
     }
 
     public function index(): void
     {
-        $salles = $this->salleRepository->findAll();
+        $salles = $this->salleService->lister();
 
-        require __DIR__ . '/../../templates/salle/index.php';
+        $this->render('salle/index', ['salles' => $salles]);
     }
 
     public function show(int $id): void
     {
-        $salle = $this->salleRepository->findById($id);
+        $salle = $this->salleService->trouverParId($id);
 
         if ($salle === null) {
-            http_response_code(404);
-            require __DIR__ . '/../../templates/error/404.php';
+            $this->notFound();
             return;
         }
 
-        require __DIR__ . '/../../templates/salle/show.php';
-    }
-
-    public function create(): void
-    {
-        $errors = [];
-
-        require __DIR__ . '/../../templates/salle/form.php';
-    }
-
-    public function store(): void
-    {
+        $this->render('salle/show', ['salle' => $salle]);
     }
 
     public function edit(int $id): void
     {
-        $salle = $this->salleRepository->findById($id);
+        $salle = $this->salleService->trouverParId($id);
 
         if ($salle === null) {
-            http_response_code(404);
-            require __DIR__ . '/../../templates/error/404.php';
+            $this->notFound();
             return;
         }
 
-        $errors = [];
-
-        require __DIR__ . '/../../templates/salle/form.php';
+        $this->render('salle/form', [
+            'salle' => $salle,
+            'errors' => [],
+        ]);
     }
 
     public function update(int $id): void
     {
+        $dto = (new CreerSalleDTOBuilder())
+            ->setNom($_POST['nom'] ?? '')
+            ->setBatiment($_POST['batiment'] ?? '')
+            ->setCapacite((int) ($_POST['capacite'] ?? 0))
+            ->setType($_POST['type'] ?? '')
+            ->build();
+
+        try {
+            $salle = $this->modifierSalleService->execute($id, $dto);
+        } catch (SalleIndisponibleException $e) {
+            $this->notFound();
+            return;
+        }
+
+        $this->redirect('/salles/' . $salle->id);
     }
 }

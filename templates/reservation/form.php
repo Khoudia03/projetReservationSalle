@@ -16,6 +16,20 @@ ob_start();
 
 <h1>Nouvelle réservation</h1>
 
+<?php if (!empty($errors)): ?>
+
+    <div class="error">
+
+        <?php foreach ($errors as $error): ?>
+
+            <p><?= e($error) ?></p>
+
+        <?php endforeach; ?>
+
+    </div>
+
+<?php endif; ?>
+
 <form method="POST" action="/reservations">
 
     <div class="form-group">
@@ -180,6 +194,7 @@ ob_start();
 </p>
 
 <?php
+
 $content = ob_get_clean();
 
 require __DIR__ . '/../layout/base.php';

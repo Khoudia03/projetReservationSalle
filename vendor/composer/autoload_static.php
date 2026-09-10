@@ -116,7 +116,7 @@ class ComposerStaticInit6ce2797e8669fc52945726d34942adf4
         ),
         'Tests\\' => 
         array (
-            0 => __DIR__ . '/../..' . '/tests',
+            0 => __DIR__ . '/../..' . '/test',
         ),
         'Symfony\\Polyfill\\Php86\\' => 
         array (
@@ -862,6 +862,7 @@ class ComposerStaticInit6ce2797e8669fc52945726d34942adf4
         'PHPUnit\\Logging\\TestDox\\TestResultCollectionIterator' => __DIR__ . '/..' . '/phpunit/phpunit/src/Logging/TestDox/TestResult/TestResultCollectionIterator.php',
         'PHPUnit\\Logging\\TestDox\\TestResultCollector' => __DIR__ . '/..' . '/phpunit/phpunit/src/Logging/TestDox/TestResult/TestResultCollector.php',
         'PHPUnit\\Logging\\TestDox\\TestSkippedSubscriber' => __DIR__ . '/..' . '/phpunit/phpunit/src/Logging/TestDox/TestResult/Subscriber/TestSkippedSubscriber.php',
+        'PHPUnit\\Logging\\TestDox\\TestSuiteSkippedSubscriber' => __DIR__ . '/..' . '/phpunit/phpunit/src/Logging/TestDox/TestResult/Subscriber/TestSuiteSkippedSubscriber.php',
         'PHPUnit\\Logging\\TestDox\\TestTriggeredDeprecationSubscriber' => __DIR__ . '/..' . '/phpunit/phpunit/src/Logging/TestDox/TestResult/Subscriber/TestTriggeredDeprecationSubscriber.php',
         'PHPUnit\\Logging\\TestDox\\TestTriggeredNoticeSubscriber' => __DIR__ . '/..' . '/phpunit/phpunit/src/Logging/TestDox/TestResult/Subscriber/TestTriggeredNoticeSubscriber.php',
         'PHPUnit\\Logging\\TestDox\\TestTriggeredPhpDeprecationSubscriber' => __DIR__ . '/..' . '/phpunit/phpunit/src/Logging/TestDox/TestResult/Subscriber/TestTriggeredPhpDeprecationSubscriber.php',

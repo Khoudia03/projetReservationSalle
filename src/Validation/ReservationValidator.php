@@ -12,41 +12,48 @@ class ReservationValidator implements ValidatorInterface
     {
         $errors = [];
 
-        if (!v::intType()->positive()->validate($data['salle_id'] ?? null)) {
-            $errors['salle_id'] = 'La salle est invalide.';
-        }
+        $rules = [
+            'salle_id' => [
+                v::intType()->positive(),
+                'La salle est invalide.'
+            ],
 
-        if (!v::stringType()->length(2, 120)->validate($data['responsable'] ?? null)) {
-            $errors['responsable'] = 'Le responsable doit contenir entre 2 et 120 caractères.';
-        }
+            'responsable' => [
+                v::stringType()->length(2, 120),
+                'Le responsable doit contenir entre 2 et 120 caractères.'
+            ],
 
-        if (!v::email()->validate($data['email'] ?? null)) {
-            $errors['email'] = 'L’adresse email est invalide.';
-        }
+            'email' => [
+                v::email(),
+                'L’adresse email est invalide.'
+            ],
 
-        if (!v::stringType()->length(5, 255)->validate($data['motif'] ?? null)) {
-            $errors['motif'] = 'Le motif doit contenir entre 5 et 255 caractères.';
-        }
+            'motif' => [
+                v::stringType()->length(5, 255),
+                'Le motif doit contenir entre 5 et 255 caractères.'
+            ],
 
-        if (!v::dateTime('Y-m-d H:i:s')->validate($data['date_debut'] ?? null)) {
-            $errors['date_debut'] = 'La date de début est invalide.';
-        }
+            'date_debut' => [
+                v::dateTime('Y-m-d H:i:s'),
+                'La date de début est invalide.'
+            ],
 
-        if (!v::dateTime('Y-m-d H:i:s')->validate($data['date_fin'] ?? null)) {
-            $errors['date_fin'] = 'La date de fin est invalide.';
+            'date_fin' => [
+                v::dateTime('Y-m-d H:i:s'),
+                'La date de fin est invalide.'
+            ],
+        ];
+
+        foreach ($rules as $field => [$validator, $message]) {
+            if (!$validator->validate($data[$field] ?? null)) {
+                $errors[$field] = $message;
+            }
         }
 
         if (!empty($errors)) {
-            return new ValidationResult(
-                false,
-                $errors
-            );
+            return new ValidationResult(false, $errors);
         }
 
-        return new ValidationResult(
-            true,
-            [],
-            $data
-        );
+        return new ValidationResult(true, [], $data);
     }
 }
