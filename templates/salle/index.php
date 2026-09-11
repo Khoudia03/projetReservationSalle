@@ -62,6 +62,25 @@ ob_start();
 
     </tbody>
 </table>
+<div>
+    <?php foreach ($pagination['pages'] as $page): ?>
+
+        <?php if ($page['current']): ?>
+
+            <strong>
+                <?= e($page['number']) ?>
+            </strong>
+
+        <?php else: ?>
+
+            <a href="<?= e($page['url']) ?>">
+                <?= e($page['number']) ?>
+            </a>
+
+        <?php endif; ?>
+
+    <?php endforeach; ?>
+</div>
 
 <?php
 $content = ob_get_clean();

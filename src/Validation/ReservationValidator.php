@@ -34,26 +34,36 @@ class ReservationValidator implements ValidatorInterface
             ],
 
             'date_debut' => [
-                v::dateTime('Y-m-d H:i:s'),
+                v::dateTime('Y-m-d\TH:i'),
                 'La date de début est invalide.'
             ],
 
             'date_fin' => [
-                v::dateTime('Y-m-d H:i:s'),
+                v::dateTime('Y-m-d\TH:i'),
                 'La date de fin est invalide.'
             ],
         ];
 
         foreach ($rules as $field => [$validator, $message]) {
+
             if (!$validator->validate($data[$field] ?? null)) {
+
                 $errors[$field] = $message;
             }
         }
 
         if (!empty($errors)) {
-            return new ValidationResult(false, $errors);
+
+            return new ValidationResult(
+                false,
+                $errors
+            );
         }
 
-        return new ValidationResult(true, [], $data);
+        return new ValidationResult(
+            true,
+            [],
+            $data
+        );
     }
 }

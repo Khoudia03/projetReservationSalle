@@ -17,12 +17,14 @@ use App\Service\CreerReservationService;
 use App\Service\ModifierSalleService;
 use App\Service\ReservationService;
 use App\Service\SalleService;
+use App\Service\CreerSalleService;
 use App\Validation\ReservationValidator;
 use App\Validation\SalleValidator;
 use Dotenv\Dotenv;
 use FastRoute\Dispatcher;
 use Illuminate\Database\Capsule\Manager;
 use Psr\Container\ContainerInterface;
+use Illuminate\Pagination\Paginator;
 use function DI\autowire;
 use function DI\factory;
 use function FastRoute\simpleDispatcher;
@@ -30,11 +32,7 @@ use function FastRoute\simpleDispatcher;
 return [
 
     Manager::class => factory(function (): Manager {
-
-        $dotenv = Dotenv::createImmutable(
-            dirname(__DIR__)
-        );
-
+        $dotenv = Dotenv::createImmutable(dirname(__DIR__));
         $dotenv->load();
 
         $capsule = new Manager();
@@ -52,8 +50,16 @@ return [
         ]);
 
         $capsule->setAsGlobal();
-
         $capsule->bootEloquent();
+
+        Paginator::currentPageResolver(
+            function (): int {
+                return max(
+                    1,
+                    (int) ($_GET['page'] ?? 1)
+                );
+            }
+        );
 
         return $capsule;
     }),
@@ -91,7 +97,7 @@ return [
         autowire(ReservationValidator::class),
 
 
-   
+
 
     CreerReservationService::class =>
         autowire(CreerReservationService::class),
@@ -101,6 +107,9 @@ return [
 
     SalleService::class =>
         autowire(SalleService::class),
+
+    CreerSalleService::class =>
+        autowire(CreerSalleService::class),
 
     ReservationService::class =>
         autowire(ReservationService::class),

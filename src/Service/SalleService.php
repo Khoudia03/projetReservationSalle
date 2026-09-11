@@ -6,6 +6,7 @@ namespace App\Service;
 
 use App\Model\Salle;
 use App\Repositorie\SalleRepositoryInterface;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 final class SalleService
 {
@@ -22,5 +23,10 @@ final class SalleService
     public function trouverParId(int $id): ?Salle
     {
         return $this->salleRepository->findById($id);
+    }
+
+    public function paginer(int $perPage = 10): LengthAwarePaginator
+    {
+        return $this->salleRepository->paginate($perPage);
     }
 }

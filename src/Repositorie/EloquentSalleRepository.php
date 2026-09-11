@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repositorie;
 
 use App\Model\Salle;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 final class EloquentSalleRepository implements SalleRepositoryInterface
 {
@@ -23,5 +24,10 @@ final class EloquentSalleRepository implements SalleRepositoryInterface
         $salle->save();
 
         return $salle;
+    }
+
+    public function paginate(int $perPage = 10): LengthAwarePaginator
+    {
+        return Salle::query()->paginate($perPage);
     }
 }

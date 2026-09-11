@@ -6,6 +6,7 @@ namespace App\Service;
 
 use App\Model\Reservation;
 use App\Repositorie\ReservationRepositoryInterface;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 final class ReservationService
 {
@@ -22,5 +23,10 @@ final class ReservationService
     public function trouverParId(int $id): ?Reservation
     {
         return $this->reservationRepository->findById($id);
+    }
+
+    public function paginer(int $perPage = 10): LengthAwarePaginator
+    {
+        return $this->reservationRepository->paginate($perPage);
     }
 }
