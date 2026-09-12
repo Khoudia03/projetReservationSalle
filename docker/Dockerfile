@@ -17,4 +17,5 @@ RUN composer install --no-dev --optimize-autoloader
 
 RUN chown -R www-data:www-data /var/www/html
 
-CMD ["php-fpm"]
+EXPOSE 8080
+CMD php -S 0.0.0.0:${PORT:-8080} -t public
