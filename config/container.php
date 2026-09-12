@@ -35,7 +35,7 @@ return [
 
     Manager::class => factory(function (): Manager {
         $dotenv = Dotenv::createImmutable(dirname(__DIR__));
-        $dotenv->load();
+        $dotenv->safeLoad();
 
         $capsule = new Manager();
 
