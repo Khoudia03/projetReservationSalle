@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Filter\ReservationFilter;
 use App\Model\Reservation;
 use App\Repositorie\ReservationRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -25,8 +26,11 @@ final class ReservationService
         return $this->reservationRepository->findById($id);
     }
 
-    public function paginer(int $perPage = 10): LengthAwarePaginator
+    public function paginer(ReservationFilter $filter,int $perPage = 10): LengthAwarePaginator 
     {
-        return $this->reservationRepository->paginate($perPage);
+        return $this->reservationRepository->paginate(
+            $filter,
+            $perPage
+        );
     }
 }

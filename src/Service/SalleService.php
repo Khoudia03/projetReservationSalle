@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Filter\SalleFilter;
 use App\Model\Salle;
 use App\Repositorie\SalleRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -25,8 +26,11 @@ final class SalleService
         return $this->salleRepository->findById($id);
     }
 
-    public function paginer(int $perPage = 10): LengthAwarePaginator
+    public function paginer(SalleFilter $filter,int $perPage = 10): LengthAwarePaginator 
     {
-        return $this->salleRepository->paginate($perPage);
+        return $this->salleRepository->paginate(
+            $filter,
+            $perPage
+        );
     }
 }

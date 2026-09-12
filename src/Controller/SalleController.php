@@ -9,8 +9,9 @@ use App\Exception\SalleIndisponibleException;
 use App\Http\ResponseStrategyInterface;
 use App\Service\CreerSalleService;
 use App\Service\ModifierSalleService;
+use App\Filter\SalleFilter;
 use App\Service\SalleService;
-use App\Validation\SalleValidator;
+use App\Validation\SalleInterfaceValidation;
 
 final class SalleController extends AbstractController
 {
@@ -18,7 +19,7 @@ final class SalleController extends AbstractController
         private SalleService $salleService,
         private CreerSalleService $creerSalleService,
         private ModifierSalleService $modifierSalleService,
-        private SalleValidator $validator,
+        private SalleInterfaceValidation $validator,
         ResponseStrategyInterface $response
     ) {
         parent::__construct($response);
@@ -27,33 +28,67 @@ final class SalleController extends AbstractController
 
     public function index(): void
     {
-      
-        $salles = $this->salleService->paginer(5);
+        $filter = new SalleFilter(
+            nom: $_GET['nom'] ?? null,
+            batiment: $_GET['batiment'] ?? null,
+            type: $_GET['type'] ?? null
+        );
+
+        $salles = $this->salleService->paginer($filter,5);
+
+        $params = array_filter([
+            'nom' => $filter->nom(),
+            'batiment' => $filter->batiment(),
+            'type' => $filter->type(),
+        ], fn($value) => $value !== null && $value !== '');
 
         $pagination = [
             'currentPage' => $salles->currentPage(),
             'lastPage' => $salles->lastPage(),
-            'previousPageUrl' => $salles->previousPageUrl(),
-            'nextPageUrl' => $salles->nextPageUrl(),
+
+            'previousPageUrl' => $salles->currentPage() > 1
+                ? '/salles?' . http_build_query(
+                    array_merge(
+                        $params,
+                        ['page' => $salles->currentPage() - 1]
+                    )
+                )
+                : null,
+
+            'nextPageUrl' => $salles->hasMorePages()
+                ? '/salles?' . http_build_query(
+                    array_merge(
+                        $params,
+                        ['page' => $salles->currentPage() + 1]
+                    )
+                )
+                : null,
+
             'hasMorePages' => $salles->hasMorePages(),
+
             'pages' => [],
         ];
 
         for ($page = 1; $page <= $salles->lastPage(); $page++) {
             $pagination['pages'][] = [
                 'number' => $page,
-                'url' => $salles->url($page),
+
+                'url' => '/salles?' . http_build_query(
+                    array_merge(
+                        $params,
+                        ['page' => $page]
+                    )
+                ),
+
                 'current' => $page === $salles->currentPage(),
             ];
         }
 
-        $this->render(
-            'salle/index',
-            [
-                'salles' => $salles,
-                'pagination' => $pagination,
-            ]
-        );
+        $this->render('salle/index', [
+            'salles' => $salles,
+            'pagination' => $pagination,
+            'filters' => $params,
+        ]);
     }
 
 

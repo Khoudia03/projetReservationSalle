@@ -12,7 +12,8 @@ use App\Service\AnnulerReservationService;
 use App\Service\CreerReservationService;
 use App\Service\ReservationService;
 use App\Service\SalleService;
-use App\Validation\ReservationValidator;
+use App\Validation\ReservationInterfaceValidation;
+use App\Filter\ReservationFilter;
 use DateTimeImmutable;
 use InvalidArgumentException;
 
@@ -24,7 +25,7 @@ final class ReservationController extends AbstractController
         private SalleService $salleService,
         private CreerReservationService $creerReservationService,
         private AnnulerReservationService $annulerReservationService,
-        private ReservationValidator $validator,
+        private ReservationInterfaceValidation $validator,
         ResponseStrategyInterface $response
     ) {
         parent::__construct($response);
@@ -33,36 +34,89 @@ final class ReservationController extends AbstractController
 
     public function index(): void
     {
-        $reservations = $this->reservationService->paginer(5);
+        $filter = new ReservationFilter(
+            responsable: $_GET['responsable'] ?? null,
+            email: $_GET['email'] ?? null,
+            salleId: isset($_GET['salle_id'])
+            ? (int) $_GET['salle_id']
+            : null,
+            statut: $_GET['statut'] ?? null,
+            dateDebut: $_GET['date_debut'] ?? null,
+            dateFin: $_GET['date_fin'] ?? null
+        );
+
+        $reservations = $this->reservationService->paginer(
+            $filter,
+            5
+        );
+
+        $params = array_filter([
+            'responsable' => $filter->responsable(),
+            'email' => $filter->email(),
+            'salle_id' => $filter->salleId(),
+            'statut' => $filter->statut(),
+            'date_debut' => $filter->dateDebut(),
+            'date_fin' => $filter->dateFin(),
+        ], fn($value) => $value !== null && $value !== '');
 
         $pagination = [
             'currentPage' => $reservations->currentPage(),
+
             'lastPage' => $reservations->lastPage(),
+
             'previousPageUrl' => $reservations->currentPage() > 1
-                ? '/reservations?page=' . ($reservations->currentPage() - 1)
+                ? '/reservations?' . http_build_query(
+                    array_merge(
+                        $params,
+                        [
+                            'page' => $reservations->currentPage() - 1
+                        ]
+                    )
+                )
                 : null,
+
             'nextPageUrl' => $reservations->hasMorePages()
-                ? '/reservations?page=' . ($reservations->currentPage() + 1)
+                ? '/reservations?' . http_build_query(
+                    array_merge(
+                        $params,
+                        [
+                            'page' => $reservations->currentPage() + 1
+                        ]
+                    )
+                )
                 : null,
+
             'hasMorePages' => $reservations->hasMorePages(),
+
             'pages' => [],
         ];
 
-        for ($page = 1; $page <= $reservations->lastPage(); $page++) {
+        for (
+            $page = 1;
+            $page <= $reservations->lastPage();
+            $page++
+        ) {
             $pagination['pages'][] = [
                 'number' => $page,
-                'url' => '/reservations?page=' . $page,
+
+                'url' => '/reservations?' . http_build_query(
+                    array_merge(
+                        $params,
+                        [
+                            'page' => $page
+                        ]
+                    )
+                ),
+
                 'current' => $page === $reservations->currentPage(),
             ];
         }
 
-        $this->render(
-            'reservation/index',
-            [
-                'reservations' => $reservations,
-                'pagination' => $pagination,
-            ]
-        );
+        $this->render('reservation/index', [
+            'reservations' => $reservations,
+            'pagination' => $pagination,
+            'filters' => $params,
+        ]);
     }
 
 

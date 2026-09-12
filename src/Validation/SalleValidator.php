@@ -6,7 +6,7 @@ namespace App\Validation;
 
 use Respect\Validation\Validator as v;
 
-class SalleValidator implements ValidatorInterface
+class SalleValidator implements SalleInterfaceValidation
 {
     public function validate(array $data): ValidationResult
     {

@@ -8,7 +8,8 @@ services:
     volumes:
       - ..:/var/www/html
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
 
   nginx:
     image: nginx:alpine
@@ -19,19 +20,38 @@ services:
       - ..:/var/www/html
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
-      - php
+      php:
+        condition: service_started
 
   mysql:
     image: mysql:8.0
     container_name: reservation-mysql
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: reservation_salles
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
     ports:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u${DB_USERNAME}", "-p${DB_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: reservation-phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: ${DB_HOST}
+      PMA_PORT: ${DB_PORT}
+    depends_on:
+      mysql:
+        condition: service_healthy
 
 volumes:
   mysql_data:

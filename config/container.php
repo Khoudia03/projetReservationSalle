@@ -18,6 +18,8 @@ use App\Service\ModifierSalleService;
 use App\Service\ReservationService;
 use App\Service\SalleService;
 use App\Service\CreerSalleService;
+use App\Validation\ReservationInterfaceValidation;
+use App\Validation\SalleInterfaceValidation;
 use App\Validation\ReservationValidator;
 use App\Validation\SalleValidator;
 use Dotenv\Dotenv;
@@ -89,11 +91,10 @@ return [
         autowire(EloquentReservationRepository::class),
 
 
-
-    SalleValidator::class =>
+    SalleInterfaceValidation::class =>
         autowire(SalleValidator::class),
 
-    ReservationValidator::class =>
+    ReservationInterfaceValidation::class =>
         autowire(ReservationValidator::class),
 
 
