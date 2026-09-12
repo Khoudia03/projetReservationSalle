@@ -1,13 +1,14 @@
 <?php
 
 declare(strict_types=1);
+require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 use Dotenv\Dotenv;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Pagination\Paginator;
 
 $dotenv = Dotenv::createImmutable(dirname(__DIR__));
-$dotenv->load();
+$dotenv->safeLoad();
 
 $capsule = new Capsule();
 
