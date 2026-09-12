@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Dotenv\Dotenv;
 use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Pagination\Paginator;
 
 $dotenv = Dotenv::createImmutable(dirname(__DIR__));
 $dotenv->load();
@@ -24,5 +25,14 @@ $capsule->addConnection([
 
 $capsule->setAsGlobal();
 $capsule->bootEloquent();
+
+Paginator::currentPageResolver(
+    function (): int {
+        return max(
+            1,
+            (int) ($_GET['page'] ?? 1)
+        );
+    }
+);
 
 return $capsule;

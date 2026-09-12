@@ -31,5 +31,5 @@ return function ($router): void {
 
     $router->addRoute('GET','/reservations/{id:\d+}',[ReservationController::class, 'show']);
 
-    $router->addRoute('POST','/reservations/{id:\d+/cancel}',[ReservationController::class, 'cancel']);
+    $router->addRoute('POST','/reservations/{id:\d+}/cancel',[ReservationController::class, 'cancel']);
 };

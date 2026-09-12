@@ -7,7 +7,7 @@ $title = isset($salle)
     : 'Créer une salle';
 
 $action = isset($salle)
-    ? '/salles/' . $salle->id
+    ? '/salles/' . $salle->id . '/edit'
     : '/salles';
 
 $nom = $salle->nom ?? '';

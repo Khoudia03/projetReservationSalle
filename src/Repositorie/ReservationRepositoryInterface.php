@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Repositorie;
 
 use App\Model\Reservation;
+use App\Filter\ReservationFilter;
 use DateTimeImmutable;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 interface ReservationRepositoryInterface
 {
@@ -23,4 +25,6 @@ interface ReservationRepositoryInterface
     public function save(Reservation $reservation): Reservation;
 
     public function cancel(Reservation $reservation): Reservation;
+
+   public function paginate( ReservationFilter $filter, int $perPage = 10 ): LengthAwarePaginator;
 }
